@@ -1,0 +1,21 @@
+{
+  "name": "test",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "start": "./node_modules/forever/bin/forever index.js"
+  },
+  "author": "",
+  "license": "ISC",
+  "dependencies": {
+    "body-parser": "^1.12.3",
+    "cantrip": "^0.1.0",
+    "connect-ratelimit": "0.0.7",
+    "cors": "^2.5.3",
+    "express": "^4.12.3",
+    "forever": "^0.14.1",
+    "request": "^2.55.0"
+  }
+}
