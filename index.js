@@ -2,6 +2,7 @@ var express = require('express');
 var cors = require('cors');
 var bodyParser = require('body-parser');
 var limiter = require("connect-ratelimit");
+var fs = require('fs');
 var cantrips = [];
 
 var app = express();
@@ -24,7 +25,7 @@ app.use(limiter({
 }));
 
 app.use(function(req, res, next) {
-	if(res.ratelimit.exceeded) {
+	if (res.ratelimit.exceeded) {
 		return res.send({
 			"error": "Rate limit exceeded"
 		});
@@ -38,18 +39,38 @@ app.get("/", function(req, res) {
 
 
 
-app.use('/:id',function(req, res, next){
+app.use('/:id', function(req, res, next) {
+	var firstRequest = false;
+
+	if (!fs.existsSync(__dirname + '/data/' + req.params.id + '.json')) {
+		firstRequest = true;
+	}
+
 	cantrips[req.params.id] = require("cantrip")({
-		file : __dirname + '/data/' + req.params.id + '.json'
+		file: __dirname + '/data/' + req.params.id + '.json'
 	});
 
-	app.use('/'+req.params.id, cantrips[req.params.id]);
+	if (firstRequest) {
+		cantrips[req.params.id].set('/', {
+			"todos": [{
+				"_createdDate": 1430899221405,
+				"_modifiedDate": 1430899221405,
+				"_id": "778b81e247f7d2ae38732ccf0087e2207c71f623",
+				"text": "Buy some milk"
+			}],
+			"settings": {
+				"foo": "bar"
+			}
+		});
+	}
 
-	app.use('/'+req.params.id, function(req, res, next) {
+	app.use('/' + req.params.id, cantrips[req.params.id]);
+
+	app.use('/' + req.params.id, function(req, res, next) {
 		res.send(res.body);
 	});
 
-	app.use('/'+req.params.id, function(err, req, res, next) {
+	app.use('/' + req.params.id, function(err, req, res, next) {
 		if (err.status) res.status(err.status);
 		res.send({
 			error: err.error
